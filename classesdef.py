@@ -972,7 +972,6 @@ for k in range(0,5):
 
 print 'player1 ntiles:',player1.playerboard.estate.ntiles()
 
-exit()
 
 
 
