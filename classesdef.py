@@ -363,10 +363,13 @@ class Game:
         ''' Distributes silverlings according to player's number of Mines.'''
         for np,p in enumerate(self.player):
             nmines = p.playerboard.estate.countMines()
-            p.playerboard.silverlingstorage += nmines
+            if not p.science[2]:
+                p.playerboard.silverlingstorage += nmines
+                print 'Player',np,'received',nmines,'silverlings'
             if p.science[2]:
+                p.playerboard.silverlingstorage += nmines
                 p.playerboard.worker += nmines
-            print 'Player',np,'received',nmines,'silverlings'
+                print 'Player',np,'received',nmines,'silverlings and',nmines,'workers'
         
     def turnDistributeStuff(self):
         gb = self.gameboard
@@ -461,8 +464,9 @@ class Player:
         self.sold = False     ## False if you've sold before this turn, and True if you haven't
         self.science = [0,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False]
 
-    def explore(self): ## returns the list of all final states that
-                       ## can be obtained from self by playing given dice
+    def explore(self):
+        ''' Returns list of all final states that can be obtained from 
+        self by playing given dice.'''
 #        print self.effect
         global logandexecute
         forks = []
@@ -484,6 +488,7 @@ class Player:
             return flatten(results)
 
     def roll(self):
+        ''' Roll dice.'''
         self.playerboard.dice = [random.randint(1,6),random.randint(1,6)]
         print 'Player',self.playernumber,'rolled',self.playerboard.dice
 
@@ -492,7 +497,8 @@ class Player:
         self.playerboard.worker += 4
 
     @log
-    def actionTakeWorkerTiles(self,ndie): ## exchanges n-th die for a worker
+    def actionTakeWorkerTiles(self,ndie):
+        ''' Exchanges n-th die for a worker.'''
         if self.verbose:
             print 'Exchanging die',self.playerboard.dice[ndie],'by 2 workers'
         self.playerboard.dice.pop(ndie)
@@ -542,7 +548,8 @@ class Player:
 
 
     @log
-    def convertWorker(self,ndie,direction): ## direction can be +1 or -1
+    def convertWorker(self,ndie,direction):
+         ''' Spend 1 worker to add or subtract 1 from a die number.'''
          self.playerboard.worker -= 1
          if self.playerboard.dice[ndie] == 6 and direction == +1:
              self.playerboard.dice[ndie] = 1
@@ -577,6 +584,7 @@ class Player:
 
     @log
     def actionTakeFromBlackdepot(self,ndepot):
+        ''' Take a tile from the blackdepot and place it in storage.'''
         sixsidedtile = self.gameboard.blackdepot[ndepot]
         self.gameboard.blackdepot[ndepot] = None
         self.playerboard.storage.append(sixsidedtile)
@@ -592,7 +600,8 @@ class Player:
         self.effect = None
 
 
-    def findOptions(self): ## find possible moves in a certain playerboard
+    def findOptions(self): 
+        ''' Find possible moves in a certain playerboard.'''
         self.options = []
         pb = self.playerboard
 
@@ -693,6 +702,7 @@ class Player:
         
     @log
     def actionSellGoods(self, ndie, pos):
+        ''' Use ndie to sell goods in position pos.'''
 #        print 'first',self.playerboard.goodsstorage
         points = len(self.playerboard.goodsstorage[pos]) * self.gameboard.nplayers
         self.vp += points
