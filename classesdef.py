@@ -363,13 +363,13 @@ class Game:
         ''' Distributes silverlings according to player's number of Mines.'''
         for np,p in enumerate(self.player):
             nmines = p.playerboard.estate.countMines()
-            if not p.science[2]:
-                p.playerboard.silverlingstorage += nmines
-                print 'Player',np,'received',nmines,'silverlings'
             if p.science[2]:
                 p.playerboard.silverlingstorage += nmines
                 p.playerboard.worker += nmines
                 print 'Player',np,'received',nmines,'silverlings and',nmines,'workers'
+            else:
+                p.playerboard.silverlingstorage += nmines
+                print 'Player',np,'received',nmines,'silverlings'
         
     def turnDistributeStuff(self):
         gb = self.gameboard
