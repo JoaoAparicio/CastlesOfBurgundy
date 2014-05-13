@@ -308,6 +308,9 @@ class PlayerBoard:
         self.worker = n
 
 class Game:
+    ''' Game object, does everything a game master would do:
+    increment turns, distribute tiles and silverlings, etc.'''
+
     def __init__(self,n):
         self.turn = 0
         self.phase = None
@@ -333,6 +336,7 @@ class Game:
         self.turnorder = [[self.player[0]],[],[],[],[],[],[]]
 
     def advance(self,player):
+        ''' Advances a player in the turn order.'''
         for nturn,turn in enumerate(self.turnorder):
             if player in turn:
                 turn.pop(turn.index(player))
@@ -340,6 +344,9 @@ class Game:
                 break
 
     def incturn(self):
+        ''' Increments turn.
+        Distributes tiles, players roll dice, explores possible actions,
+        executes an action according to player strategy.'''
         self.turnDistributeStuff()
         global logandexecute
         for i in self.turnorder:
@@ -353,6 +360,7 @@ class Game:
                 player.strat(player,l)
 
     def distributesilverlings(self):
+        ''' Distributes silverlings according to player's number of Mines.'''
         for np,p in enumerate(self.player):
             nmines = p.playerboard.estate.countMines()
             p.playerboard.silverlingstorage += nmines
