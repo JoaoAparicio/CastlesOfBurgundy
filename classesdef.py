@@ -1,7 +1,4 @@
 ## VP aren't being taken into account properly.
-## city hall effect is bugged. if it happens that no tiles exist in storage, then the next round isn't played
-## zoneSubtypeAvailable isn't working properly. Always returns True?!?!
-## warehouse effect still not implemented
 ## completely implemented sciences: 2,3 (but not activated)
 
 
@@ -49,6 +46,7 @@ def scramblelist(x):
     return temp
 
 def initializepiles(n):
+    ''' Instanciate the correct number of each tile.'''
     blackback = []
     shipspile = []
     for i in range(0,20):
@@ -144,11 +142,14 @@ class EstateTile:
         self.pos = None
 
 class Estate:
+    ''' Collection of properly initiallized EstateTiles and their respective zones.'''
+
     def __init__(self):
         self.e = initializeEstate()
         self.zones = initializeZones(self.e)
 
     def countMines(self):
+        ''' Returns number of Mines in the Estate '''
         counter = 0
         for estatetile in self.e:
             if not estatetile.placement == None:
@@ -157,34 +158,42 @@ class Estate:
         return counter
 
     def whichzone(self,n):
+        ''' Given an EstateTile number n, returns the zone index the 
+        EstateTile belongs to'''
         for nzone,zone in enumerate(self.zones):
             if self.e[n] in zone:
                 return nzone
 
-    def countAnimalsInAZone(self,animal,zone):
+    def countAnimalsInAZone(self,animal,nzone):
+        ''' Returns how many animals of a certain type are in
+        a certain zone number n.'''
         counter = 0
-        for estatetile in self.zones[zone]:
+        for estatetile in self.zones[nzone]:
             if not estatetile.placement == None:
                 if estatetile.placement.subtype[0] == animal:
                     counter += estatetile.placement.subtype[1]
         return counter
 
-    def zoneSubtypeAvailable(self,subtype,zone): ## returns True is a certain zone is available for a certain
-                             ## subtype of type Beige, and False if it isn't
-        for estatetile in self.zones[zone]:
+    def zoneSubtypeAvailable(self,subtype,nzone):
+        ''' Returns True if a certain zone number nzone is 
+        available to place a certain subtype of type Beige, and
+        False if it isn't.'''
+        for estatetile in self.zones[nzone]:
             if not estatetile.placement == None:
                 if estatetile.placement.subtype == subtype:
                     return False
         return True
 
     def ntiles(self):
+        ''' Returns total number of EstateTiles placed.'''
         counter = 0
         for tile in self.e:
             if not tile.placement == None:
                 counter += 1
         return counter
 
-    def findAvailableDie(self,die): ## returns list of EstateTiles with a given die number
+    def findAvailableDie(self,die):
+        ''' Returns list of EstateTiles with a given die number.'''
         avai = []
         for estatetile in self.e:
             if not estatetile.placement == None:
@@ -193,7 +202,8 @@ class Estate:
                         avai.append(neighbor)
         return avai
 
-    def findAvailableType(self,type): ## returns list of EstateTiles with a given die number
+    def findAvailableType(self,type):
+        ''' Returns list of EstateTiles with a given type.'''
         avai = []
         for estatetile in self.e:
             if not estatetile.placement == None:
@@ -202,7 +212,8 @@ class Estate:
                         avai.append(neighbor)
         return avai
 
-    def findAvailableTypeDie(self,type,die): ## returns list of EstateTiles with a given die number
+    def findAvailableTypeDie(self,type,die):
+        ''' Returns list of EstateTiles with a given die number and type.'''
         avai = []
         for estatetile in self.e:
             if not estatetile.placement == None:
@@ -211,7 +222,8 @@ class Estate:
                         avai.append(neighbor)
         return avai
 
-    def findAvailableTypeDieN(self,type,die): ## same as above, but returns position in the estate list
+    def findAvailableTypeDieN(self,type,die):
+        ''' Returns list of EstateTiles indexes with a given die number and type.'''
         avai = []
         for estatetile in self.e:
             if not estatetile.placement == None:
@@ -221,6 +233,7 @@ class Estate:
         return avai
 
     def findAvailableAll(self):
+        ''' Returns list of all non-occupied EstateTiles.'''
         avai = []
         for estatetile in self.e:
             if not estatetile.placement == None:
