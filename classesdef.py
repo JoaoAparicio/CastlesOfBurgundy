@@ -525,7 +525,7 @@ class Player:
             if self.verbose:
                 print 'Effect: take from storage tile of type',sixsidedtile.type,sixsidedtile.subtype,'and place it on estate tile number',nestatetile
         
-        if sixsidedtile.type == 'Dark Green':
+        if sixsidedtile.type in ['Dark Green']:
             self.effect = sixsidedtile
         if sixsidedtile.type == 'Green':
             animal = sixsidedtile.subtype[0]
@@ -599,10 +599,25 @@ class Player:
     @log
     def effectDarkGreen(self,die):  ## as the effect of placing a dark green tile, you get a die
         if self.verbose:
-            print 'Effect (Dark Green) adding extra die',die
+            print 'Effect (Dark Green): adding extra die',die
         self.playerboard.dice.append(die)
         self.effect = None
 
+    @log
+    def effectBlue(self,ndepot):
+        ''' As the effect of placing a Blue tile, you get to collect goods.'''
+        if self.verbose:
+            print 'Effect (Blue): collecting goods from depot nr', ndepot
+        for n,goodstile in enumerate(self.gameboard.depots[ndepot]['goods']):
+            for goodstor in self.playerboard.goodsstorage:
+                if not goodstor:
+                    goodstor.append(goodstile)
+                    break
+                if goodstor[0].type == goodstile.type:
+                    goodstor.append(goodstile)
+                    break
+        self.gameboard.depots[ndepot]['goods'] = []
+        self.effect = None
 
     def findOptions(self): 
         ''' Find possible moves in a certain playerboard.'''
@@ -712,6 +727,9 @@ class Player:
         self.vp += points
 #        print 'VP increment!'
 
+        self.playerboard.goodsstorage[pos] = []
+        die = self.playerboard.dice.pop(ndie)
+
         self.playerboard.silverlingstorage += 1
         if self.verbose:
             print 'Using die',die,' sold goods, won',points,'points and 1 silverling'
@@ -724,8 +742,6 @@ class Player:
             if self.verbose:
                 print '... and 1 worker (science 4)'
 
-        self.playerboard.goodsstorage[pos] = []
-        die = self.playerboard.dice.pop(ndie)
 #        print 'second',self.playerboard.goodsstorage
         self.sold = True
 
