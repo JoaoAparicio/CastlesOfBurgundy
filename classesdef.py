@@ -608,7 +608,7 @@ class Player:
         ''' As the effect of placing a Blue tile, you get to collect goods.'''
         if self.verbose:
             print 'Effect (Blue): collecting goods from depot nr', ndepot
-        for n,goodstile in enumerate(self.gameboard.depots[ndepot]['goods']):
+        for goodstile in self.gameboard.depots[ndepot]['goods']:
             for goodstor in self.playerboard.goodsstorage:
                 if not goodstor:
                     goodstor.append(goodstile)
