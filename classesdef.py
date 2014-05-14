@@ -525,7 +525,7 @@ class Player:
             if self.verbose:
                 print 'Effect: take from storage tile of type',sixsidedtile.type,sixsidedtile.subtype,'and place it on estate tile number',nestatetile
         
-        if sixsidedtile.type in ['Dark Green']:
+        if sixsidedtile.type in ['Dark Green', 'Blue']:
             self.effect = sixsidedtile
         if sixsidedtile.type == 'Green':
             animal = sixsidedtile.subtype[0]
@@ -673,8 +673,11 @@ class Player:
 
 
         else:
+            if self.effect.type == 'Blue':
+                for i in range(1,7):  ## this range is 1-6: all possible depots
+                    self.effectBlue(i)
             if self.effect.type == 'Dark Green':
-                for i in range(1,7):
+                for i in range(1,7):  ## this range is 1-6: all possible dice
                     self.effectDarkGreen(i)
             if self.effect.type == 'Beige':
                 if self.effect.subtype[0] in ["Carpenter's Workshop", 'Church', 'Market']:
