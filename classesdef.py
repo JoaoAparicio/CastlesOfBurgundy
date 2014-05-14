@@ -711,14 +711,21 @@ class Player:
         points = len(self.playerboard.goodsstorage[pos]) * self.gameboard.nplayers
         self.vp += points
 #        print 'VP increment!'
-        if self.science[3]:
-            self.playerboard.silverlingstorage += 2
-        else:
-            self.playerboard.silverlingstorage += 1
-        self.playerboard.goodsstorage[pos] = []
-        die = self.playerboard.dice.pop(ndie)
+
+        self.playerboard.silverlingstorage += 1
         if self.verbose:
             print 'Using die',die,' sold goods, won',points,'points and 1 silverling'
+        if self.science[3]:
+            self.playerboard.silverlingstorage += 1
+            if self.verbose:
+                print '... and 1 silverling more (science 3)'
+        if self.science[4]:
+            self.playerboard.worker += 1
+            if self.verbose:
+                print '... and 1 worker (science 4)'
+
+        self.playerboard.goodsstorage[pos] = []
+        die = self.playerboard.dice.pop(ndie)
 #        print 'second',self.playerboard.goodsstorage
         self.sold = True
 
