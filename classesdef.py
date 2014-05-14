@@ -504,8 +504,12 @@ class Player:
         self.playerboard.dice.pop(ndie)
         self.playerboard.worker += 2
         if self.science[13]:
+            if self.verbose:
+                print '... and one silverling (science 13)'
             self.playerboard.silverlingsstorage += 1
         if self.science[14]:
+            if self.verbose:
+                print '... and two workers more (science 14)'
             self.playerboard.worker += 2
 
     @log
