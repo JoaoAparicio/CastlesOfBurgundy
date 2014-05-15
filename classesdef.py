@@ -19,11 +19,17 @@ class SixSidedTile:
 
     def __str__(self):
         return 'type='+self.type+' subtype='+str(self.subtype)+' blackback='+str(self.blackback)
+    def __repr__(self):
+        return self.type+' '+str(self.subtype)+' blackback='+str(self.blackback)
 
 # in the case of Goods Tiles, type is just a number 1-6
 class GoodsTile:
     def __init__(self,type):
         self.type = type
+    def __str__(self):
+        return 'Goods(%d)' % self.type
+    def __repr__(self):
+        return 'Goods(%d)' % self.type
 
 def flatten(x):
     result = []
@@ -352,8 +358,8 @@ class Game:
         for i in self.turnorder:
             for player in i:
                 player.sold = False
-#                print player.playerboard.storage
                 print player.playerboard.goodsstorage
+                print player.playerboard.storage
                 player.roll()
                 logandexecute = False
                 l = player.explore()
@@ -603,21 +609,70 @@ class Player:
         self.playerboard.dice.append(die)
         self.effect = None
 
-    @log
-    def effectBlue(self,ndepot):
-        ''' As the effect of placing a Blue tile, you get to collect goods.'''
-        if self.verbose:
-            print 'Effect (Blue): collecting goods from depot nr', ndepot
-        for goodstile in self.gameboard.depots[ndepot]['goods']:
-            for goodstor in self.playerboard.goodsstorage:
+    def takeFromGoodsDepot(self, ndepot):
+        gb = self.gameboard
+        pb = self.playerboard
+        for goodstile in gb.depots[ndepot]['goods']:
+            for goodstor in pb.goodsstorage:
                 if not goodstor:
                     goodstor.append(goodstile)
                     break
                 if goodstor[0].type == goodstile.type:
                     goodstor.append(goodstile)
                     break
-        self.gameboard.depots[ndepot]['goods'] = []
+        gb.depots[ndepot]['goods'] = []
+
+    @log
+    def effectBlue(self,ndepot):
+        ''' As the effect of placing a Blue tile, you get to collect goods.'''
+        gb = self.gameboard
+        pb = self.playerboard
+        if self.verbose:
+            print 'Effect (Blue): collecting goods',gb.depots[ndepot]['goods'],'from depot nr', ndepot
+#        takeFromGoodsDepot(self, ndepot)
+        for goodstile in gb.depots[ndepot]['goods']:
+            for goodstor in pb.goodsstorage:
+                if not goodstor:
+                    goodstor.append(goodstile)
+                    break
+                if goodstor[0].type == goodstile.type:
+                    goodstor.append(goodstile)
+                    break
+        gb.depots[ndepot]['goods'] = []
         self.effect = None
+
+    @log
+    def effectBlueWithScienceFive(self,ndepot):
+        ''' As the effect of placing a Blue tile with science 5, you
+        get to collect goods from two neighboring depots.'''
+        gb = self.gameboard
+        pb = self.playerboard
+        ndepot1 = (ndepot-1)%6 + 1  ## actually these formulas allow ndepot to be any integer
+        ndepot2 = ndepot%6 + 1      ## and still ndepot1 and 2 will be two consecutive numbers from 1 to 6
+        if self.verbose:
+            print 'Effect (Blue) with science 5: collecting goods from depots nr',ndepot1,'and',ndepot2,':'
+            print 'goods',gb.depot[ndepot1]['goods'], 'and',gb.depot[ndepot2]['goods']
+#        takeFromGoodsDepot(self, ndepot1)
+#        takeFromGoodsDepot(self, ndepot2)
+        for goodstile in gb.depots[ndepot1]['goods']:
+            for goodstor in pb.goodsstorage:
+                if not goodstor:
+                    goodstor.append(goodstile)
+                    break
+                if goodstor[0].type == goodstile.type:
+                    goodstor.append(goodstile)
+                    break
+        gb.depots[ndepot1]['goods'] = []
+        for goodstile in gb.depots[ndepot2]['goods']:
+            for goodstor in pb.goodsstorage:
+                if not goodstor:
+                    goodstor.append(goodstile)
+                    break
+                if goodstor[0].type == goodstile.type:
+                    goodstor.append(goodstile)
+                    break
+        gb.depots[ndepot2]['goods'] = []
+
 
     def findOptions(self): 
         ''' Find possible moves in a certain playerboard.'''
