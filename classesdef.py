@@ -284,9 +284,9 @@ class FuncObj(object):
                 global logandexecute
                 logandexecute = True
                 if parent == None:
-                    getattr(self.args[0], self.name)(*self.args[1:]);
+                    getattr(self.args[0], self.name)(*self.args[1:], **self.kwargs);
                 else:
-                    getattr(parent, self.name)(*self.args[1:])
+                    getattr(parent, self.name)(*self.args[1:], **self.kwargs)
 
 def log(func):
         def logger(*args, **kwargs):
@@ -576,21 +576,30 @@ class Player:
          self.playerboard.dice[ndie] += direction
 
     @log
-    def actionTakeSixSidedTileFromTheGameboard(self,ndepot,nspace,usedie=True):
+    def actionTakeSixSidedTileFromTheGameboard(self,ndepot,nspace,case=0):
+#    def actionTakeSixSidedTileFromTheGameboard(self,ndepot,nspace,case=0):
         sixsidedtile = self.gameboard.depots[ndepot][nspace]
         self.playerboard.storage.append(sixsidedtile)
 #        if sixsidedtile == None:
 #           print 'ADDED None TO THE STORAGE!'
         self.gameboard.depots[ndepot][nspace] = None
-        if usedie == True:
+#        print 'case',case
+#        if usedie: ## case 0 is die
+        if case==0: ## die
+#            print ndepot
             i = self.playerboard.dice.index(ndepot)
             die = self.playerboard.dice.pop(i)
             if self.verbose:
                 print 'Using die',die,', take from depot',ndepot,'space',nspace,'a tile of type',sixsidedtile.type,sixsidedtile.subtype
-        else:
+            return None
+        if case==1: ## effect
             self.effect = None
             if self.verbose:
                 print 'Effect: from depot',ndepot,', space',nspace,' take a tile of type',sixsidedtile,sixsidedtile.subtype
+        if case==2: ## science 6
+            self.effect = None
+            if self.verbose:
+                print 'Science 6: from depot',ndepot,', space',nspace,' take a tile of type',sixsidedtile,sixsidedtile.subtype
 
     @log
     def actionTakeFromBlackdepot(self,ndepot):
@@ -685,7 +694,7 @@ class Player:
                 for die in pb.dice:
                     for i in range(1,5):
                         if not self.gameboard.depots[die][i] == None:
-                            self.actionTakeSixSidedTileFromTheGameboard(die,i)
+                            self.actionTakeSixSidedTileFromTheGameboard(die,i,case=0)
 
             ### CONVERT 1 DIE INTO 2 WORKER TILES
             for i in range(0,len(pb.dice)):
@@ -718,7 +727,11 @@ class Player:
                 for ndepot in self.gameboard.blackdepot.keys():
                     if not self.gameboard.blackdepot[ndepot] == None:
                         self.actionTakeFromBlackdepot(ndepot)
-##                if self.science[6]:
+                if self.science[6]:
+                    for ndepot in range(1,7):
+                        for nspace in range(1,5):
+                            if self.gameboard.depots[ndepot][nspace]:
+                                self.actionTakeSixSidedTileFromTheGameboard(ndepot,nspace,case=2)
 
             if not self.sold:
                 for ndie,die in enumerate(self.playerboard.dice):
@@ -766,7 +779,8 @@ class Player:
                 for k in range(1,5):
                     if not self.gameboard.depots[i][k] == None:
                         if self.gameboard.depots[i][k].type in map[subtype[0]]:
-                            self.actionTakeSixSidedTileFromTheGameboard(i,k,False)
+                            self.actionTakeSixSidedTileFromTheGameboard(i,k,case=1)
+#                            self.actionTakeSixSidedTileFromTheGameboard(i,k,case=1)
         self.effect = None
 
     ## given l=[[],[],[]], returns the index of the entry of die type, and -1 if it doesn't exist
