@@ -76,15 +76,18 @@ def initializepiles(n):
     knowledgespile = []
     for i in range(1,7):
         knowledgespile.append(SixSidedTile('Yellow',False,i))
+#        knowledgespile.append(SixSidedTile('Yellow',False,6))
     blackback.append(SixSidedTile('Yellow',True,7))
     for i in range(8,12):
         knowledgespile.append(SixSidedTile('Yellow',False,i))
+#        knowledgespile.append(SixSidedTile('Yellow',False,6))
     blackback.append(SixSidedTile('Yellow',True,12))
     knowledgespile.append(SixSidedTile('Yellow',False,13))
     blackback.append(SixSidedTile('Yellow',True,14))
     blackback.append(SixSidedTile('Yellow',True,15))
     for i in range(16,24):
         knowledgespile.append(SixSidedTile('Yellow',False,i))
+#        knowledgespile.append(SixSidedTile('Yellow',False,6))
     blackback.append(SixSidedTile('Yellow',True,24))
     blackback.append(SixSidedTile('Yellow',True,25))
     knowledgespile.append(SixSidedTile('Yellow',False,26))
@@ -512,7 +515,7 @@ class Player:
         if self.science[13]:
             if self.verbose:
                 print '... and one silverling (science 13)'
-            self.playerboard.silverlingsstorage += 1
+            self.playerboard.silverlingstorage += 1
         if self.science[14]:
             if self.verbose:
                 print '... and two workers more (science 14)'
@@ -555,6 +558,8 @@ class Player:
                     print 'Placed Watchtower, received 4 victory points'
             if sixsidedtile.subtype[0] in ["Carpenter's Workshop", 'Church', 'Market', 'City Hall']:
                 self.effect = sixsidedtile
+        if sixsidedtile.type == 'Yellow':
+            self.science[sixsidedtile.subtype[0]] = True
 
 
     @log
